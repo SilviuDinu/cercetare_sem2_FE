@@ -34,7 +34,7 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  
+
   .options-wrapper {
     display: flex;
     flex-direction: column;
@@ -82,6 +82,10 @@
       max-width: 100%;
       flex-direction: row;
     }
+
+    &.empty {
+      overflow-y: hidden;
+    }
   }
   button {
     width: 90px;
@@ -105,5 +109,17 @@
         background-color: #1877f2;
       }
     }
+  }
+
+  .message {
+    color: #e4e6eb;
+    font-size: 16px;
+    border-radius: 30px;
+    text-align: center;
+    min-height: 40px;
+    margin-top: 8px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    word-break: break-all;
   }
 }
