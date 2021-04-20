@@ -1,0 +1,109 @@
+* {
+  box-sizing: border-box;
+}
+.App {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #282c34;
+  color: #e4e6eb;
+}
+
+.body {
+  height: 200vh;
+  margin-top: 64px;
+}
+
+.App-header {
+  margin-top: 64px;
+  align-self: center;
+  align-items: center;
+  align-content: center;
+  text-align: center;
+  font-size: calc(10px + 2vmin);
+  color: #e4e6eb;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.symtpoms-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  
+  .options-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    flex-wrap: row wrap;
+    word-wrap: none;
+    width: 500px;
+    max-height: 500px;
+    overflow-y: scroll;
+
+    .option {
+      display: flex;
+      margin-top: 8px;
+      line-height: 24px;
+      max-height: 24px;
+
+      .symptom-checkbox {
+        display: flex;
+        align-content: flex-end;
+        align-self: flex-end;
+        align-items: flex-end;
+        flex-direction: column;
+        vertical-align: middle;
+        width: 20%;
+        height: 20px;
+      }
+
+      .label {
+        display: flex;
+        flex-direction: column;
+        align-content: flex-start;
+        align-self: flex-start;
+        align-items: flex-start;
+        width: 100%;
+        margin-left: 8px;
+      }
+    }
+
+    .divider {
+      display: block;
+      overflow: hidden;
+      border-style: inset;
+      border-width: 1px;
+      margin-top: 8px;
+      max-width: 100%;
+      flex-direction: row;
+    }
+  }
+  button {
+    width: 90px;
+    height: 40px;
+    border: 0;
+    border-radius: 50px;
+    margin: 0 8px;
+    font-size: 16px;
+    color: #ecf3ff;
+    outline: none;
+    cursor: pointer;
+    background-color: #2851a3;
+
+    &.submit-btn {
+      min-width: 60px;
+      background-color: #2851a3;
+      margin-top: 32px;
+      margin-bottom: 32px;
+
+      &:hover {
+        background-color: #1877f2;
+      }
+    }
+  }
+}

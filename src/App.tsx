@@ -1,24 +1,24 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from 'react';
+import './App.scss';
+import './components/Form'
+import Form from './components/Form';
+import { SYMPTOMS } from './constants/symptoms';
+import { MESSAGES } from './enums/messages.enum';
 
 function App() {
+
+  const [options, setOptions] = useState<any[]>(SYMPTOMS);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="App-header">
+        {MESSAGES.HEADER}
+      </div>
+      <div className="body">
+        <Form
+          options={options}>
+        </Form>
+      </div>
     </div>
   );
 }
