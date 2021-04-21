@@ -10,7 +10,7 @@ import { MESSAGES } from './enums/messages.enum';
 import _ from 'lodash';
 
 function App() {
-  const [options, setOptions] = useState<any[]>(SYMPTOMS);
+  const [options] = useState<any[]>(SYMPTOMS);
   const [filter, setFilter] = useState<any>({
     selected: false,
     searchValue: ''
@@ -27,9 +27,9 @@ function App() {
       symptoms: selected,
       ids,
     };
-    if (_.isEqual(reqBody, previousReq)) {
-      return;
-    }
+    // if (_.isEqual(reqBody, previousReq)) {
+    //   return;
+    // }
     setPreviousReq(reqBody);
     const response = await fetch(ENDPOINTS.PREDICT_DISEASE, {
       method: 'POST',

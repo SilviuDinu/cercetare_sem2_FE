@@ -526,9 +526,5 @@ export const SYMPTOMS = [
     {
         id: 131,
         symptom: "yellow crust ooze"
-    },
-    {
-        id: 132,
-        symptom: "prognosis"
     }
 ]
