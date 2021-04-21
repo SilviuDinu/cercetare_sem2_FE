@@ -24,7 +24,7 @@ export default function Symptoms(props: any) {
               </div>
             );
           })
-        : <Message message={MESSAGES.NO_RESULTS} />}
+        : <Message message={MESSAGES.NO_RESULTS} isVisible={filteredOptions.length === 0} />}
     </div>
   );
 }

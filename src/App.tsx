@@ -1,13 +1,14 @@
+import { stringify } from 'node:querystring';
 import { useState } from 'react';
 import './App.scss';
 import './components/Form'
 import Form from './components/Form';
+import Message from './components/Message';
 import Search from './components/Search';
 import Selections from './components/Selections';
 import { SYMPTOMS } from './constants/symptoms';
 import { ENDPOINTS } from './enums/endpoints.enum';
 import { MESSAGES } from './enums/messages.enum';
-import _ from 'lodash';
 
 function App() {
   const [options] = useState<any[]>(SYMPTOMS);
@@ -16,7 +17,8 @@ function App() {
     searchValue: ''
   });
   const [selected, setSelected] = useState<any>([]);
-  const [previousReq, setPreviousReq] = useState<any>(null);
+  const [prediction, setPrediction] = useState<{id?: number, disease?: string}>();
+  const [message, setMessage] = useState<{type?: string, message?: string}>();
 
   const onFormSubmit = async (event: Event) => {
     event.preventDefault();
@@ -27,16 +29,18 @@ function App() {
       symptoms: selected,
       ids,
     };
-    // if (_.isEqual(reqBody, previousReq)) {
-    //   return;
-    // }
-    setPreviousReq(reqBody);
+
     const response = await fetch(ENDPOINTS.PREDICT_DISEASE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(reqBody),
     });
-    console.log(response);
+    const data = await response.json();
+    setPrediction(data);
+    setMessage({
+      message: MESSAGES.PREDICTION + data.disease,
+      type: 'notification',
+    });
   };
 
   const onSearch = (event: Event) => {
@@ -57,6 +61,8 @@ function App() {
       currentState.splice(idx, 1);
       setSelected(currentState);
     }
+
+    setMessage({message: ''});
   };
 
   return (
@@ -65,6 +71,11 @@ function App() {
         {MESSAGES.HEADER}
       </div>
       <div className="body">
+        <Message
+          isVisible={!!prediction && message}
+          message={message?.message}
+          type={message?.type}
+        />
         <Search
           value={filter.searchValue}
           onChange={onSearch}>

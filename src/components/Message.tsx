@@ -1,7 +1,12 @@
 export default function Message(props: any) {
+  const { isVisible } = props;
   return (
-    <div className="message">
-      <span>{props.message}</span>
-    </div>
+    <>
+      {isVisible ? (
+        <div className={"message " + props.type}>
+          <span>{props.message}</span>
+        </div>
+      ) : null}
+    </>
   );
 }
