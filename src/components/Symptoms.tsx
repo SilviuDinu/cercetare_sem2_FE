@@ -13,12 +13,12 @@ export default function Symptoms(props: any) {
       {filteredOptions.length > 0
         ? filteredOptions.map((option: any) => {
             return (
-              <div key={option.id} data-key={option.id}>
+              <div key={option.id}>
                 <div className="option">
                   <label htmlFor={option.id} className="label">
                     {option.symptom}
                   </label>
-                  <input type="checkbox" name={option.id} className={'symptom-checkbox ' + option.symptom} />
+                  <input type="checkbox" onChange={event => props.onSelect(option, event.target.checked)} name={option.id} className={'symptom-checkbox ' + option.symptom} />
                 </div>
                 <span className="divider"></span>
               </div>
