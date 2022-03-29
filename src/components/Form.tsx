@@ -13,6 +13,7 @@ export default function Form(props: any) {
         <Symptoms
           filter={filter}
           options={options}
+          selections={props.selections}
           onSelect={props.onSelect}>
         </Symptoms>
 

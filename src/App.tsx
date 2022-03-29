@@ -1,7 +1,6 @@
-import { stringify } from 'node:querystring';
 import { useState } from 'react';
 import './App.scss';
-import './components/Form'
+import './components/Form';
 import Form from './components/Form';
 import Message from './components/Message';
 import Search from './components/Search';
@@ -14,11 +13,11 @@ function App() {
   const [options] = useState<any[]>(SYMPTOMS);
   const [filter, setFilter] = useState<any>({
     selected: false,
-    searchValue: ''
+    searchValue: '',
   });
   const [selected, setSelected] = useState<any>([]);
-  const [prediction, setPrediction] = useState<{id?: number, disease?: string}>();
-  const [message, setMessage] = useState<{type?: string, message?: string}>();
+  const [prediction, setPrediction] = useState<{ id?: number; disease?: string }>();
+  const [message, setMessage] = useState<{ type?: string; message?: string }>();
 
   const onFormSubmit = async (event: Event) => {
     event.preventDefault();
@@ -35,24 +34,24 @@ function App() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(reqBody),
     });
-    const data = await response.json();
-    setPrediction(data);
-    setMessage({
-      message: MESSAGES.PREDICTION + data.disease,
-      type: 'notification',
-    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setPrediction(data);
+      setMessage({
+        message: MESSAGES.PREDICTION + data.disease,
+        type: 'notification',
+      });
+    }
   };
 
   const onSearch = (event: Event) => {
-    setFilter(
-      {...filter,
-        searchValue: (event.target as HTMLTextAreaElement).value
-      });
-  }
+    setFilter({ ...filter, searchValue: (event.target as HTMLTextAreaElement).value });
+  };
 
   const onSelect = (option: { id: number; symptom: string }, status: boolean): void => {
     const currentState = [...selected];
-    const found = currentState.find((elem: any) => elem.symptom === option.symptom)
+    const found = currentState.find((elem: any) => elem.symptom === option.symptom);
     const idx = currentState.indexOf(found);
 
     if (status === true) {
@@ -62,31 +61,29 @@ function App() {
       setSelected(currentState);
     }
 
-    setMessage({message: ''});
+    setMessage({ message: '' });
+  };
+
+  const onRemove = (option: { id: number; symptom: string }): void => {
+    const idx = selected.findIndex((elem: any) => elem.symptom === option.symptom);
+
+    selected.splice(idx, 1);
+    setSelected([...selected]);
   };
 
   return (
     <div className="App">
-      <div className="App-header">
-        {MESSAGES.HEADER}
-      </div>
+      <div className="App-header">{MESSAGES.HEADER}</div>
       <div className="body">
-        <Message
-          isVisible={!!prediction && message}
-          message={message?.message}
-          type={message?.type}
-        />
-        <Search
-          value={filter.searchValue}
-          onChange={onSearch}>
-        </Search>
-        <Selections options={selected}/>
+        <Message isVisible={!!prediction && message} message={message?.message} type={message?.type} />
+        <Search value={filter.searchValue} onChange={onSearch}></Search>
+        <Selections options={selected} onRemove={onRemove} />
         <Form
           filter={filter}
           onSubmit={onFormSubmit}
           onSelect={onSelect}
-          options={options}>
-        </Form>
+          options={options}
+          selections={selected}></Form>
       </div>
     </div>
   );
