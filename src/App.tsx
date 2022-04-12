@@ -5,7 +5,9 @@ import Form from './components/Form';
 import Message from './components/Message';
 import Search from './components/Search';
 import Selections from './components/Selections';
+import VideoCapture from './components/VideoCapture';
 import { SYMPTOMS } from './constants/symptoms';
+import { LoadingProvider } from './contexts/LoadingContext';
 import { ENDPOINTS } from './enums/endpoints.enum';
 import { MESSAGES } from './enums/messages.enum';
 
@@ -15,7 +17,9 @@ function App() {
     selected: false,
     searchValue: '',
   });
+  const [showVideoCapture, setShowVideoCapture] = useState<boolean>(false);
   const [selected, setSelected] = useState<any>([]);
+  const [agreedToTerms, setAgreedToTerms] = useState<any>(false);
   const [prediction, setPrediction] = useState<{ id?: number; disease?: string }>();
   const [message, setMessage] = useState<{ type?: string; message?: string }>();
 
@@ -38,6 +42,7 @@ function App() {
     if (response.ok) {
       const data = await response.json();
       setPrediction(data);
+      setShowVideoCapture(data && data.disease?.toLowerCase().includes('depression'));
       setMessage({
         message: MESSAGES.PREDICTION + data.disease,
         type: 'notification',
@@ -74,17 +79,49 @@ function App() {
   return (
     <div className="App">
       <div className="App-header">{MESSAGES.HEADER}</div>
-      <div className="body">
-        <Message isVisible={!!prediction && message} message={message?.message} type={message?.type} />
-        <Search value={filter.searchValue} onChange={onSearch}></Search>
-        <Selections options={selected} onRemove={onRemove} />
-        <Form
-          filter={filter}
-          onSubmit={onFormSubmit}
-          onSelect={onSelect}
-          options={options}
-          selections={selected}></Form>
-      </div>
+      <LoadingProvider>
+        <div className="body">
+          <Message isVisible={!!prediction && message} message={message?.message} type={message?.type} />
+
+          {showVideoCapture ? (
+            !agreedToTerms ? (
+              <div className="row" style={{ textAlign: 'left' }}>
+                Our diagnosis model predicts that your symptoms are tied to <b>depression</b>.{' '}
+                <div className="row">
+                  In order to further continue the diagnosis process we would need 4 pictures of your face to analyze
+                  your emotions.
+                </div>
+                <div className="row">
+                  Please rest assured that these pictures are not stored on the server side and they are deleted after
+                  use.
+                </div>
+                <div className="row">Do you agree to continue?</div>
+                <div className="row" style={{ display: 'flex', justifyContent: 'center' }}>
+                  <button type="submit" onClick={(e) => setAgreedToTerms(true)}>
+                    Agree
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <VideoCapture />
+            )
+          ) : (
+            <>
+              <Search value={filter.searchValue} onChange={onSearch}></Search>
+              <Selections options={selected} onRemove={onRemove} />
+              <Form
+                filter={filter}
+                onSubmit={onFormSubmit}
+                onSelect={onSelect}
+                options={options}
+                selections={selected}></Form>
+            </>
+          )}
+          {agreedToTerms && prediction && prediction.disease?.toLowerCase().includes('depression') && (
+            <button onClick={(e) => setShowVideoCapture(!showVideoCapture)}>Toggle video recording</button>
+          )}
+        </div>
+      </LoadingProvider>
     </div>
   );
 }

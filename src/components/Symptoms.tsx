@@ -13,7 +13,7 @@ export default function Symptoms(props: any) {
       {filteredOptions.length > 0 ? (
         filteredOptions.map((option: any) => {
           return (
-            <div key={option.id}>
+            <div key={option.id} onClick={(event) => props.onSelect(option, true)}>
               <div className="option">
                 <label htmlFor={option.id} className="label">
                   {option.symptom}
