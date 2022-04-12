@@ -18,7 +18,7 @@ export default function Form(props: any) {
         </Symptoms>
 
         <button className="submit-btn" type="submit">
-          Send
+          Submit symptoms
         </button>
       </form>
     </>

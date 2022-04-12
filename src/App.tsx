@@ -20,7 +20,7 @@ function App() {
   const [showVideoCapture, setShowVideoCapture] = useState<boolean>(false);
   const [selected, setSelected] = useState<any>([]);
   const [agreedToTerms, setAgreedToTerms] = useState<any>(false);
-  const [prediction, setPrediction] = useState<{ id?: number; disease?: string }>();
+  const [prediction, setPrediction] = useState<{ id?: number; disease?: string; probability: string }>();
   const [message, setMessage] = useState<{ type?: string; message?: string }>();
 
   const onFormSubmit = async (event: Event) => {
@@ -80,16 +80,22 @@ function App() {
     <div className="App">
       <div className="App-header">{MESSAGES.HEADER}</div>
       <LoadingProvider>
-        <div className="body">
+        <div className="body" style={{ marginBottom: 64 }}>
           <Message isVisible={!!prediction && message} message={message?.message} type={message?.type} />
 
           {showVideoCapture ? (
             !agreedToTerms ? (
               <div className="row" style={{ textAlign: 'left' }}>
-                Our diagnosis model predicts that your symptoms are tied to <b>depression</b>.{' '}
+                Our diagnosis model predicts that your symptoms are tied to <b>depression</b>. We estimate a
+                <b>
+                  {' '}
+                  {String((Number(prediction?.probability) * 100).toFixed(2))}
+                  {'%'}
+                </b>{' '}
+                severity.
                 <div className="row">
-                  In order to further continue the diagnosis process we would need 4 pictures of your face to analyze
-                  your emotions.
+                  In order to further continue the diagnosis process we would need a few pictures of your face to
+                  analyze your emotions.
                 </div>
                 <div className="row">
                   Please rest assured that these pictures are not stored on the server side and they are deleted after
@@ -100,10 +106,24 @@ function App() {
                   <button type="submit" onClick={(e) => setAgreedToTerms(true)}>
                     Agree
                   </button>
+                  <button type="submit" onClick={() => setShowVideoCapture(false)}>
+                    Back
+                  </button>
                 </div>
               </div>
             ) : (
-              <VideoCapture />
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <VideoCapture />
+                <button type="submit" onClick={() => setShowVideoCapture(false)}>
+                  Back
+                </button>
+              </div>
             )
           ) : (
             <>
@@ -118,7 +138,9 @@ function App() {
             </>
           )}
           {agreedToTerms && prediction && prediction.disease?.toLowerCase().includes('depression') && (
-            <button onClick={(e) => setShowVideoCapture(!showVideoCapture)}>Toggle video recording</button>
+            <button style={{ marginTop: 16 }} onClick={(e) => setShowVideoCapture(!showVideoCapture)}>
+              Toggle video recording
+            </button>
           )}
         </div>
       </LoadingProvider>

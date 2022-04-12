@@ -1,4 +1,5 @@
-import React, { useContext, useState } from 'react';
+import { divide } from 'lodash';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import Webcam from 'react-webcam';
 import { LoadingContext } from '../contexts/LoadingContext';
 import { ENDPOINTS } from '../enums/endpoints.enum';
@@ -9,13 +10,38 @@ const videoConstraints = {
   facingMode: 'user',
 };
 
+const MAX_PHOTOS = 10;
+
 const VideoCapture = (props: any) => {
-  const [loading, setLoading] = useContext(LoadingContext);
+  const [, setLoading] = useContext(LoadingContext);
   const [imagesSrc, setImagesSrc] = useState<any[]>([]);
   const [predictions, setPredictions] = useState<any[]>([]);
+  const [counter, setCounter] = useState(5);
+  const [testLinkClicked, setTestLinkClicked] = useState(false);
+  const [autoSubmit, setAutoSubmit] = useState<any>(true);
+  const captureButtonRef = useRef(null);
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
+    if (counter > 0) {
+      const timeout = setTimeout(() => setCounter(counter - 1), 1000);
+    } else {
+      if (imagesSrc.length <= MAX_PHOTOS) {
+        clearTimeout((intervalRef as any).current);
+        if (captureButtonRef.current) {
+          (intervalRef as any).current = setTimeout(() => (captureButtonRef as any).current.click(), 200);
+        }
+      }
+    }
+    if (imagesSrc.length === MAX_PHOTOS && !predictions.length) {
+      handleImagesSubmit();
+    }
+  }, [counter, imagesSrc]);
 
   const handleImagesClear = () => {
     setImagesSrc([]);
+    setPredictions([]);
+    setCounter(5);
   };
 
   const handleImagesSubmit = async () => {
@@ -44,13 +70,15 @@ const VideoCapture = (props: any) => {
     <div
       style={{
         width: '100%',
+        maxWidth: 1000,
         marginBottom: 64,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-      {imagesSrc.length < 4 && (
+      {counter > 0 && <h1>Taking pictures in: {counter} seconds</h1>}
+      {imagesSrc.length < MAX_PHOTOS && (
         <Webcam
           audio={false}
           height={400}
@@ -59,9 +87,10 @@ const VideoCapture = (props: any) => {
           videoConstraints={videoConstraints}>
           {({ getScreenshot }) => (
             <button
-              style={{ marginTop: 16 }}
+              ref={captureButtonRef}
+              style={{ marginTop: 16, visibility: 'hidden' }}
               onClick={() => {
-                if (imagesSrc.length < 4) {
+                if (imagesSrc.length < MAX_PHOTOS) {
                   const src = getScreenshot();
                   setImagesSrc(Array.from(new Set([...imagesSrc, src])));
                 }
@@ -76,19 +105,29 @@ const VideoCapture = (props: any) => {
         className="images"
         style={{
           display: 'flex',
-          marginTop: 16,
           alignItems: 'center',
           justifyContent: 'space-between',
-          flexWrap: 'wrap',
+          maxWidth: '1000px',
+          marginTop: 16,
+          overflowX: 'scroll',
         }}>
         {imagesSrc.map((imgSrc: any, idx: number) => {
-          return <img key={idx} src={imgSrc} alt="Cucu" width={250} style={{ padding: 8 }} />;
+          return (
+            <div key={idx}>
+              <img src={imgSrc} alt="Cucu" width={250} style={{ padding: 8 }} />
+            </div>
+          );
         })}
       </div>
 
-      {imagesSrc.length > 3 && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
-          <button className="submit-btn" type="submit" onClick={handleImagesSubmit}>
+      {imagesSrc.length >= MAX_PHOTOS && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-around',
+          }}>
+          <button disabled={autoSubmit} className="submit-btn" type="submit" onClick={handleImagesSubmit}>
             Send
           </button>
           <button className="submit-btn" type="submit" onClick={handleImagesClear}>
@@ -99,7 +138,13 @@ const VideoCapture = (props: any) => {
 
       <div
         className="images"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          maxWidth: '1000px',
+          overflowX: 'scroll',
+        }}>
         {predictions.map((elem: any, idx: number) => {
           return (
             <div key={idx}>
@@ -115,17 +160,47 @@ const VideoCapture = (props: any) => {
         })}
       </div>
 
-      {predictions && (
-        <div>
+      {predictions.length > MAX_PHOTOS - 1 && imagesSrc.length > MAX_PHOTOS - 1 && (
+        <div
+          style={{
+            textAlign: 'left',
+            display: 'flex',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}>
           Dominant emotion:{' '}
           {
-            predictions
-              .map((pred) => <div>{pred.prediction}</div>)
+            [...predictions]
               .sort(
                 (a, b) =>
-                  predictions.filter((pred1) => pred1.prediction === (b as any).prediction).length -
-                  predictions.filter((pred2) => pred2.prediction === (a as any).prediction).length
-              )[0]
+                  predictions.filter((pred1) => pred1.prediction === b.prediction).length -
+                  predictions.filter((pred2) => pred2.prediction === a.prediction).length
+              )
+              .map((pred, idx) => (
+                <div key={idx} className="row">
+                  <div style={{ textAlign: 'center' }}>{pred.prediction}</div>
+                  {pred.prediction === 'Sad' && !testLinkClicked && (
+                    <div className="row" style={{ marginTop: 32 }}>
+                      <div className="row">
+                        Sadness is heavily associated with depression. We estimate you may have a form of depression.
+                      </div>
+                      <div className="row">
+                        Please go{' '}
+                        <a
+                          href="https://patient.info/doctor/patient-health-questionnaire-phq-9"
+                          rel="_noopener"
+                          onClick={() => setTestLinkClicked(true)}
+                          target="_blank">
+                          on thie website
+                        </a>{' '}
+                        to complete a questionnaire and confirm our diagnosis
+                      </div>
+                    </div>
+                  )}
+                  {testLinkClicked && <div style={{ marginTop: 32 }}>Was your result positive?</div>}
+                </div>
+              ))[0]
           }
         </div>
       )}
