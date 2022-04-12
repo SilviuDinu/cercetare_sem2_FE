@@ -164,6 +164,7 @@ const VideoCapture = (props: any) => {
         <div
           style={{
             textAlign: 'left',
+            marginTop: 32,
             display: 'flex',
             justifyContent: 'center',
             flexDirection: 'column',
@@ -194,7 +195,7 @@ const VideoCapture = (props: any) => {
                           target="_blank">
                           on thie website
                         </a>{' '}
-                        to complete a questionnaire and confirm our diagnosis
+                        to complete a questionnaire and confirm our diagnosis.
                       </div>
                     </div>
                   )}

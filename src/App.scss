@@ -231,6 +231,31 @@ button {
   border: 0;
 }
 
+a {
+  color: rgb(196, 196, 232)
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 4px;
+  border-radius: 50px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
 .loading:not(:required):after {
   content: '';
   display: block;

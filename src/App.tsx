@@ -92,7 +92,7 @@ function App() {
                   {String((Number(prediction?.probability) * 100).toFixed(2))}
                   {'%'}
                 </b>{' '}
-                severity.
+                chance.
                 <div className="row">
                   In order to further continue the diagnosis process we would need a few pictures of your face to
                   analyze your emotions.
